@@ -4,13 +4,7 @@ import MapView, { Marker } from 'react-native-maps';
 
 export default function RestaurantScreen({ route, navigation }) {
 
-    const { restName, restAddress, menu } = route.params;
-
-    const {restaurantName, setRestaurantName} = useState(JSON.stringify(restName));
-    const {restaurantAddress, setRestaurantAddress} = useState(JSON.stringify(restAddress));
-    const {restaurantMenu, setRestauranMenu} = useState([]);
-
-
+    const {restaurant } = route.params;
     const key = "C0r8kKdwsm6ea23nPoIQ4FIeVqvWSlZX";
 
     const [region, setRegion] = useState({
@@ -51,11 +45,12 @@ export default function RestaurantScreen({ route, navigation }) {
 
     useEffect(() => {
         //Change to the Address of chosen Restaurant from previous screen with help of param      
-        setInput(JSON.stringify(restAddress));
+        setInput(JSON.stringify(restaurant.restaurantAddress));
         fetchLocation();
-    })
-        ;
-
+        
+    });
+      
+   
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <MapView
@@ -63,24 +58,33 @@ export default function RestaurantScreen({ route, navigation }) {
                 region={region}>
                 <Marker
                     coordinate={marker}
-                    title={JSON.stringify(restName)} />
+                    title={JSON.stringify(restaurant.restaurantName)} />
             </MapView>
             <TextInput
                 placeholderTextColor='grey'
                 placeholder='Location'
                 onChangeText={text => setInput(text)}
             />
-            <Text> Blabla , {JSON.stringify(restAddress)}</Text>
+            
+            <Text> Blabla , {JSON.stringify(restaurant.restaurantAddress)}</Text>
 
+            <FlatList
+            data={restaurant.menu}
+            renderItem={({item}) => (
+                <View>
+                    <Text>{JSON.stringify(item.name)}, {JSON.stringify(item.price)} Euro</Text>
+                    <Text>-----------------------------------------</Text>
+                </View>
+            )}
+            />
+            
+           
             <View>
-
                 <Button
                     title="Home"
                     onPress={() => navigation.navigate('Home')} // Navigate to Home screen
                 />
-
             </View>
-
         </View>
     );
 }

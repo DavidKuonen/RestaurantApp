@@ -44,13 +44,7 @@ function writeRestaurantData(restaurantId, name, address) {
 
 export default function HomeScreen({ navigation }) {
 
-    const [restaurantName, setRestaurantName] = useState('');
-    const [restaurantAddress, setRestaurantAddress] = useState('');
-    const [restaurantMenu, setRestaurantMenu] = useState([]);
-    const [name, setName] = useState('');
-    const [price, setPrice] = useState('');
     const [restaurants, setRestaurants] = useState([]);
-    const [keys, setKeys] = useState([]);
 
     useEffect(() => {
         const itemsRef = ref(database, 'restaurants/');
@@ -58,7 +52,6 @@ export default function HomeScreen({ navigation }) {
             const data = snapshot.val();
             if (data) {
                 setRestaurants(Object.values(data));
-                setKeys(Object.keys(data));
             }
             else {
                 setRestaurants([]);
@@ -69,32 +62,18 @@ export default function HomeScreen({ navigation }) {
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-
             <FlatList
                 data={restaurants}
-
-                renderItem={({ item}) => (
-
+                renderItem={({item}) => (
                     <View>
                         <Text>{item.restaurantName}, {item.restaurantAddress} </Text>
                         <Button
-                            //How to pass parameter example:
-                            //<Button title='History' onPress={() => navigation.navigate('History', {param: results})}></Button>
-                            title="Choose" onPress={() => navigation.navigate('Restaurant', { restName: item.restaurantName,
-                            restAddress: item.restaurantAddress })}> </Button>
-                        <Text>{item.menu[0].name}, {item.menu[0].price} Euro</Text>
-                        <Text>{item.menu[1].name}, {item.menu[1].price} Euro</Text>
-                        <Text>{item.menu[2].name}, {item.menu[2].price} Euro</Text>
+                            title="Choose" onPress={() => navigation.navigate('Restaurant', {
+                            restaurant: item })}> </Button>     
                         <Text>-----------------------------------------</Text>
-                        
-
                     </View>
-
                 )}
-
             />
-
-
         </View>
     );
 }
