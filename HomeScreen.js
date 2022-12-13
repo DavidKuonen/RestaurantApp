@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View, Button, FlatList } from 'react-native';
+import { StyleSheet, Image, Text, View, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, push, ref, onValue, set } from 'firebase/database';
+import { Icon, Button } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 
 const firebaseConfig = {
     apiKey: "AIzaSyBeOOEdabk5jsDIMv-mprLtBK1Rlg70Kbw",
@@ -15,32 +17,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-
-function writeRestaurantData(restaurantId, name, address) {
-    const reference = ref(database, 'restaurants/' + restaurantId);
-
-    set(reference, {
-        restaurantName: name,
-        restaurantAddress: address,
-        menu: {
-            0: {
-                name: 'Chicken Burger',
-                price: 4.90
-
-            },
-            1: {
-                name: 'Cheese Burger',
-                price: 3.60
-            },
-            2: {
-                name: 'Vegan Burger',
-                price: 4.80
-            }
-        }
-    });
-}
-
-
 
 export default function HomeScreen({ navigation }) {
 
@@ -60,20 +36,46 @@ export default function HomeScreen({ navigation }) {
 
     }, []);
 
+    const renderItem = ({ item }) => (
+        <ListItem.Swipeable
+            rightContent={
+                <Button raised icon={{ name: 'shopping-basket', color: '#CCBA78' }}
+                    title="Menu"
+                    titleStyle={{color:'#CCBA78'}}
+                    buttonStyle={{ minHeight: '100%', backgroundColor: '#525C60' }}
+                    onPress={() => navigation.navigate('Restaurant', {
+                        restaurant: item
+                    })}> </Button>
+            }>
+            <ListItem.Content>
+                <ListItem.Title>{item.restaurantName}</ListItem.Title>
+                <ListItem.Subtitle>{item.restaurantAddress}</ListItem.Subtitle>
+            </ListItem.Content>
+        </ListItem.Swipeable>
+    );
+
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <FlatList
+            <Image style={styles.logo} source={require("./assets/logo.png")} />
+            <FlatList style={styles.list}
                 data={restaurants}
-                renderItem={({item}) => (
-                    <View>
-                        <Text>{item.restaurantName}, {item.restaurantAddress} </Text>
-                        <Button
-                            title="Choose" onPress={() => navigation.navigate('Restaurant', {
-                            restaurant: item })}> </Button>     
-                        <Text>-----------------------------------------</Text>
-                    </View>
-                )}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
             />
         </View>
     );
+
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingTop: 50,
+    },
+    logo: {
+        height: 350
+    },
+    list: {
+        width: '100%',
+        marginTop: 20,
+    }
+});

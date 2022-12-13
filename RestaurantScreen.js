@@ -1,10 +1,11 @@
 import { StyleSheet, Text, TextInput, View, Button, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
+import { ListItem } from 'react-native-elements';
 
 export default function RestaurantScreen({ route, navigation }) {
 
-    const {restaurant } = route.params;
+    const { restaurant } = route.params;
     const key = "C0r8kKdwsm6ea23nPoIQ4FIeVqvWSlZX";
 
     const [region, setRegion] = useState({
@@ -18,7 +19,7 @@ export default function RestaurantScreen({ route, navigation }) {
         longitude: 24.934041
     });
 
-    const [input, setInput] = useState("Mall of Tripla, Helsinki");
+    const [input, setInput] = useState('');
 
     const fetchLocation = () => {
         fetch('https://www.mapquestapi.com/geocoding/v1/address?key=' + key + '&location=' + input)
@@ -47,44 +48,47 @@ export default function RestaurantScreen({ route, navigation }) {
         //Change to the Address of chosen Restaurant from previous screen with help of param      
         setInput(JSON.stringify(restaurant.restaurantAddress));
         fetchLocation();
-        
+
     });
-      
-   
+
+    const renderItem = ({ item }) => (
+        <ListItem.Content>
+            <ListItem.Title>{item.name}</ListItem.Title>
+            <ListItem.Subtitle>{item.price}0 Euro </ListItem.Subtitle>
+        </ListItem.Content>
+    );
+
     return (
+
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <MapView
                 style={{ flex: 1, height: '50%', width: '100%' }}
                 region={region}>
                 <Marker
                     coordinate={marker}
-                    title={JSON.stringify(restaurant.restaurantName)} />
+                    title={restaurant.restaurantName} />
             </MapView>
-            <TextInput
-                placeholderTextColor='grey'
-                placeholder='Location'
-                onChangeText={text => setInput(text)}
-            />
-            
-            <Text> Blabla , {JSON.stringify(restaurant.restaurantAddress)}</Text>
 
-            <FlatList
-            data={restaurant.menu}
-            renderItem={({item}) => (
-                <View>
-                    <Text>{JSON.stringify(item.name)}, {JSON.stringify(item.price)} Euro</Text>
-                    <Text>-----------------------------------------</Text>
-                </View>
-            )}
+            <Text style={styles.text}> Menu from {restaurant.restaurantName}</Text>
+            <FlatList style={styles.list}
+                data={restaurant.menu}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
             />
-            
-           
-            <View>
-                <Button
-                    title="Home"
-                    onPress={() => navigation.navigate('Home')} // Navigate to Home screen
-                />
-            </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingTop: 50,
+    },
+    text: {
+        paddingTop: 50,
+        fontWeight: 'bold',
+        fontSize: 20
+    },
+    list: {
+        paddingTop: 10
+    }
+});
